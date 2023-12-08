@@ -6,6 +6,15 @@ var userRepo = new userModule:UserRepo();
 var userService = new userModule:UserService(userRepo);
 var authService = new userModule:AuthService(userRepo);
 
+var frontEndAddress = "http://localhost:4200";
+@http:ServiceConfig {
+    cors: {
+        allowOrigins: [frontEndAddress],
+        allowCredentials: false,
+        maxAge: 84900
+    }
+}
+
 service / on new http:Listener(9090) {
     resource function get users() returns userModule:User[] {
         return userService.getAllUsers();
@@ -18,7 +27,7 @@ service / on new http:Listener(9090) {
     resource function post users(@http:Payload userModule:User user) returns http:Ok|http:InternalServerError {
         userService.addUser(user);
 
-        http:Ok ok = {body: "User created successfully"};
+        http:Ok ok = {body: {"msg": "User created successfully", "status": 200}};
         return ok;
     }
 
